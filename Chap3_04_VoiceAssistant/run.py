@@ -41,19 +41,23 @@ class Discussion:
 
     def __init__(
             self, state='START',
-            messages_history=[{'role': 'user',
-                               'content': f'{starting_prompt}'}]) -> None:
+            messages_history=None) -> None:
+        self.previous_state = None
+        if messages_history is None:
+            messages_history = [{'role': 'user',
+                                 'content': f'{starting_prompt}'}]
         self.state = state
         self.messages_history = messages_history
         self.client = OpenAI()
         self.stt_model = whisper.load_model("base")
-        pass
 
     def generate_answer(self, messages):
         response = self.client.chat.completions.create(
+            temperature=0,
             model="gpt-4-turbo",
             messages=messages)
-        return (response.choices[0].message.content)
+        return (response.
+                choices[0].message.content)
 
     def reset(self, start_state='START'):
         self.messages_history = [
@@ -92,23 +96,26 @@ class Discussion:
 
     def discuss(self, input=None):
         if input is not None:
+            print(f'DEBUG input={input}')
             self.messages_history.append({"role": "user", "content": input})
 
         # Generate a completion
         completion = self.generate_answer(
             self.messages_history +
             [{"role": "user", "content": prompts[self.state]}])
-
+        print(f'DEBUG completion={completion} state={self.state}')
         # Is the completion an action ?
         if completion.split("|")[0].strip() in actions:
             action = completion.split("|")[0].strip()
             self.to_state(action)
             self.do_action(completion)
+            print(f'DEBUG action={action} actions={actions} completion={completion}')
             # Continue discussion
             return self.discuss()
         # Is the completion a new state ?
         elif completion in prompts:
             self.to_state(completion)
+            print(f'DEBUG completion={completion}')
             # Continue discussion
             return self.discuss()
         # Is the completion an output for the user ?
@@ -126,13 +133,22 @@ class Discussion:
 
 if __name__ == '__main__':
     discussion = Discussion()
+    #
+    # gr.Interface(
+    #     theme=gr.themes.Soft(),
+    #     fn=discussion.discuss_from_audio,
+    #     live=True,
+    #     inputs=gr.Audio(sources="microphone", type="filepath"),
+    #     outputs="text").launch()
+    discussion.discuss('[User] 你好，我想写一封邮件给我的朋友。')
+    discussion.discuss('[User] 主题是生日快乐。')
+    discussion.discuss('[User] 收件人是张三。 祝你生日快乐, 一起顺利。就这么多了 邮箱是  zhang@123.com')
+    discussion.discuss('[User] 非常感谢')
+    # discussion.discuss('[User] 请帮我完善邮件内容。')
+    # discussion.discuss('[User] 张三，祝你生日快乐！祝你新的工作一切顺利！')
 
-    gr.Interface(
-        theme=gr.themes.Soft(),
-        fn=discussion.discuss_from_audio,
-        live=True,
-        inputs=gr.Audio(sources="microphone", type="filepath"),
-        outputs="text").launch()
+
+
 
     # To use command line instead of Gradio, remove above code and use this instead:
     # while True:
