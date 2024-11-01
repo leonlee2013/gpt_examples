@@ -39,21 +39,42 @@ def list_files():
 
 # 列出微调作业
 def list_fine_tunes():
-    ret = client.fine_tuning.list()
+    ret = client.fine_tuning.jobs.list()
     print(ret)
     return ret
 
 
 # 取消微调作业
 def cancel_fine_tune(fine_tune_id):
-    ret = client.fine_tuning.cancel(fine_tune_id)
+    # ret = client.fine_tuning.jobs.retrieve(fine_tune_id)
+    ret = client.fine_tuning.jobs.cancel(fine_tune_id)
     print(ret)
     return ret
 
 
-# upload_file("./out_openai_completion_prepared.jsonl")
+# //模型微调
+def fine_tune(training_file, model="gpt-4o-mini-2024-07-18", suffix="direct_marketing"):
+    ret = client.fine_tuning.jobs.create(training_file=training_file, model=model, suffix=suffix)
+    print(ret)
+    return ret
+
+
+# client.fine_tuning.jobs.create(
+#     training_file="file-abc123",
+#     model="gpt-4o-mini-2024-07-18"
+# )
+
 # print(aa)
 # aa = client.files.create(file=open("./out_openai_completion_prepared.jsonl", "rb"), purpose='fine-tune')
-# delete_file('file-pOkiBRHbWx108BJ7cyLP5cJV')
-list_files()
+# ft_file = upload_file("./out_openai_completion2_prepared.jsonl")
+# fine_tune(training_file=ft_file.id)
+# fine_tune('file-UW2xCj4KLU7mAt7n6hBhVOoi')
+
+# ftjob-7icIfkfrlnEnMdEOlfTwneJg
+# delete_file('file-A8T0ibgdf39NTQTMrXIugKfH')
+# list_files()
+# ftjob-pUGpGUKJD7lZjCaQNnfSDS7i
+print('=====================================')
 list_fine_tunes()
+print('=====================================')
+# cancel_fine_tune('ftjob-APTJn2zxwMIklFe1BM1y4eJT')
