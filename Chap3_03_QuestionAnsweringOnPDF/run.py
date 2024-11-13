@@ -1,8 +1,8 @@
 from dotenv import load_dotenv
 
 load_dotenv()
-from intentservice import IntentService
-from responseservice import ResponseService
+from intentservice import IntentService, get_intent
+from responseservice import ResponseService, generate_response
 from dataservice import DataService
 
 # Example pdf
@@ -24,9 +24,9 @@ response_service = ResponseService()
 # Question 
 question = 'Where to find treasure chests?'
 # Get the intent
-intents = intent_service.get_intent(question)
+intents = get_intent(question)
 # Get the facts
 facts = data_service.search_redis(intents)
 # Get the answer
-answer = response_service.generate_response(facts, question)
+answer = generate_response(facts, question)
 print(answer)

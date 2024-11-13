@@ -19,6 +19,7 @@ load_dotenv()
 #            'ACTION_WRITE_EMAIL': '[Instruction] The mail has been sent. Answer to the user to  tell the action is done'}
 # actions = ['ACTION_WRITE_EMAIL']
 
+
 starting_prompt = """你是一个助手。
 你可以与用户讨论，或执行电子邮件任务。电子邮件要求需包括主题、收件人和正文。
 你会收到以[Instruction]开始的指令，或以[User]开始的用户输入。请遵循指示。
@@ -33,6 +34,7 @@ prompts = {
     'ACTION_WRITE_EMAIL': '[Instruction] 邮件已发送。告知用户该操作已完成。'
 }
 actions = ['ACTION_WRITE_EMAIL']
+
 
 class Discussion:
     """
@@ -104,8 +106,6 @@ class Discussion:
     def discuss_from_audio(self, file):
         if file:
             # Transcribe the audio file and use the input to start the discussion
-            print(f'DEBUG file={file}')
-            print(self.transcribe(file))
             return self.discuss(f'[User] {self.transcribe(file)}')
         # Empty output if there is no file
         return ''
@@ -150,16 +150,17 @@ class Discussion:
 if __name__ == '__main__':
     discussion = Discussion()
     #
-    gr.Interface(
-        theme=gr.themes.Soft(),
-        fn=discussion.discuss_from_audio,
-        live=True,
-        inputs=gr.Audio(sources="microphone", type="filepath"),
-        outputs="text").launch()
-    # discussion.discuss('[User] 你好，我想写一封邮件给我的朋友。')
-    # discussion.discuss('[User] 主题是生日快乐。')
-    # discussion.discuss('[User] 收件人是张三。 祝你生日快乐, 一起顺利。就这么多了 邮箱是  zhang@123.com')
-    # discussion.discuss('[User] 非常感谢')
+    # gr.Interface(
+    #     theme=gr.themes.Soft(),
+    #     fn=discussion.discuss_from_audio,
+    #     live=True,
+    #     inputs=gr.Audio(sources="microphone", type="filepath"),
+    #     outputs="text").launch()
+    discussion.discuss('[User] 你好，我想写一封邮件给我的朋友。')
+    discussion.discuss('[User] 主题是生日快乐。')
+    discussion.discuss('[User] 收件人是张三。 祝你生日快乐, 一起顺利。就这么多了 邮箱是  zhang@123.com')
+    discussion.discuss('[User] 没有了，非常感谢')
+    print("history===>", discussion.messages_history)
     # discussion.discuss('[User] 请帮我完善邮件内容。')
     # discussion.discuss('[User] 张三，祝你生日快乐！祝你新的工作一切顺利！')
 
